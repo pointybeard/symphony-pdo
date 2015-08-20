@@ -21,7 +21,7 @@
     },
     "minimum-stability": "stable",
     "autoload": {
-        "classmap": ["Lib"],
+        "classmap": ["src/Lib"],
         "psr-4": {
             "SymphonyPDO\\": "src/"
         }
