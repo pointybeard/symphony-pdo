@@ -11,27 +11,24 @@ namespace SymphonyPDO\Lib;
 class ResultIterator implements \Iterator, \Countable
 {
     /**
-     * @var PDOStatement
-     *                   A statment containing data to iterator over
+     * @var PDOStatement A statment containing data to iterator over
      */
     protected $statement;
 
     /**
-     * @var int
-     *          Tracks which row in the statement we are up to
+     * @var int Tracks which row in the statement we are up to
      */
     protected $position;
 
     /**
-     * @var object
-     *             Holds an instance of $this->className containing the current row of data
+     * @var object Holds an instance of $this->className containing the current row of data
      */
     protected $current;
 
     /**
      * @var int
-     *          Used by the current() method. Allows current() to be called multiple times
-     *          without advancing the cursor
+     *   Used by the current() method. Allows current() to be called multiple times
+     *   without advancing the cursor
      */
     protected $lastPosition;
 
@@ -141,13 +138,28 @@ class ResultIterator implements \Iterator, \Countable
     /**
      * Passes each record into $callback.
      *
-     * @return int
-     *             Returns the iterator count
+     * @return int Returns total number of items iterated over
      */
     public function each(callable $callback, array $args = [])
     {
-        array_unshift($args, $this);
+        $count = 0;
 
-        return iterator_apply($this, $callback, $args);
+        // Ensure we're at the start of the iterator
+        $this->rewind();
+
+        // Loop over every item in the iterator
+        while($this->valid()){
+            // Execute the callback, giving it the data and any argments passed in
+            $callback($this->current(), $args);
+            // Move the cursor
+            $this->next();
+            // Keep track of the number of items we've looped over
+            $count++;
+        }
+
+        // Go back to the start
+        $this->rewind();
+
+        return $count;
     }
 }
