@@ -1,0 +1,29 @@
+{
+    "name": "pointybeard/symphony-pdo",
+    "type": "library",
+    "description": "Wraps the core Symphony database connection with a PDO based library.",
+    "keywords": ["symphony", "database", "pdo", "wrapper"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alistair Kearney",
+            "email": "hi@alistairkearney.com",
+            "homepage": "http://alistairkearney.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.6"
+    },
+    "support": {
+      "issues": "https://github.com/pointybeard/symphony-pdo/issues",
+      "wiki": "https://github.com/pointybeard/symphony-pdo/wiki"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "classmap": ["Lib"],
+        "psr-4": {
+            "SymphonyPDO\\": "src/"
+        }
+    }
+}
