@@ -5,7 +5,7 @@ namespace SymphonyPDO\Lib;
 use SymphonyPDO\Lib\Exceptions\DatabaseException;
 use PDO;
 
-class PDODatabase
+class Database
 {
     private $connection;
     private $tablePrefix;

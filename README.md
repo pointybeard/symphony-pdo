@@ -44,8 +44,8 @@ $query->execute();
 $result = $query->fetch();
 
 
-// Or use the PDOResultIterator class instead
-new SymphonyPDO\Lib\PDOResultIterator(
+// Or use the ResultIterator class instead
+new SymphonyPDO\Lib\ResultIterator(
 	"\\A\\Properties\\Class",
 	$query
 );

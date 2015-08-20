@@ -3,7 +3,7 @@
 namespace SymphonyPDO\Lib;
 
 /**
- * This PDOResultIterator accepts a PDOStatment class containing data.
+ * This ResultIterator accepts a PDOStatment class containing data.
  * It also is provided a classname. As the statement set is iterated over
  * new instances of the classname provded are created and the data for the current
  * row is loaded in. The new class instance is then returned.
