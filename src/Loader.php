@@ -32,7 +32,6 @@ final class Loader implements \Singleton
             $details->user,
             $details->password,
             [
-                PDO::MYSQL_ATTR_INIT_COMMAND => 'set names utf8',
                 'table-prefix' => (string) $details->tbl_prefix,
             ],
             [
