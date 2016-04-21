@@ -1,6 +1,8 @@
 Symphony PDO
 ===========
 
+[![Latest Stable Version](https://poser.pugx.org/pointybeard/symphony-pdo/v/stable)](https://packagist.org/packages/pointybeard/symphony-pdo) [![Total Downloads](https://poser.pugx.org/pointybeard/symphony-pdo/downloads)](https://packagist.org/packages/pointybeard/symphony-pdo) [![Latest Unstable Version](https://poser.pugx.org/pointybeard/symphony-pdo/v/unstable)](https://packagist.org/packages/pointybeard/symphony-pdo) [![License](https://poser.pugx.org/pointybeard/symphony-pdo/license)](https://packagist.org/packages/pointybeard/symphony-pdo)
+
 Provides PDO based connection to the Symphony database.
 
 ## Features
@@ -10,7 +12,7 @@ Provides PDO based connection to the Symphony database.
 
 ## Installation
 
-Omnipay is installed via [Composer](http://getcomposer.org/). To install, simply add it
+Symphony PDO is installed via [Composer](http://getcomposer.org/). To install, simply add it
 to your `composer.json` file:
 
 ```json
