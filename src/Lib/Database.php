@@ -19,7 +19,7 @@ class Database
             unset($options['table-prefix']);
         }
 
-        $this->connection = new PDO($dsn, $user, $password, $options);
+        $this->connection = new SymphonyPDO($dsn, $user, $password, $options);
 
         foreach ($attributes as $k => $v) {
             $this->connection->setAttribute($k, $v);
@@ -35,9 +35,7 @@ class Database
 
     public function connected()
     {
-        return (!is_null($this->connection) &&
-            is_object($this->connection) &&
-            $this->connection instanceof PDO);
+        return $this->connection instanceof PDO;
     }
 
     public function bindMultiple($query, $params, &$variable, $type)
@@ -92,20 +90,48 @@ class Database
         return $type;
     }
 
-    public function insert(array $fields, $table)
+    public function insertUpdate(array $fields, array $updatableFields, $table) {
+        $set = [];
+        foreach ($updatableFields as $key) {
+            $set[] = "`{$key}` = :{$key}";
+        }
+
+        $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s) ON DUPLICATE KEY UPDATE ' . implode(", ", $set);
+
+        return $this->insert($fields, $table, $sql);
+    }
+
+    public function insert(array $fields, $table, $sql=null)
     {
-        $set = null;
+        if(is_null($sql)) {
+            $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s);';
+        }
+
+        $params = [];
+        $keys = $values = [];
+
         foreach (array_keys($fields) as $key) {
-            $set .= "`{$key}` = :{$key}, ";
+            if(!is_null($fields[$key])) {
+                $params[] = $key;
+            }
+            $keys[] = "`{$key}`";
+            $values[] = (is_null($fields[$key]) ? 'NULL' : ":{$key}");
         }
 
         $query = $this->prepare(sprintf(
-            'INSERT INTO %s SET %s', $table, rtrim($set, ', ')
+            $sql,
+            $table,
+            implode(", ", $keys),
+            implode(", ", $values)
         ));
 
         // $value MUST be passed to bindParam by reference or it will fail!
         // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
         foreach ($fields as $key => &$value) {
+            if(!in_array($key, $params)) {
+                continue;
+            }
+
             $query->bindParam(sprintf(':%s', $key), $value, $this->__findType($value));
         }
 
@@ -114,15 +140,29 @@ class Database
         return $this->lastInsertId();
     }
 
-    public function update(array $fields, $table, $where = null)
+    public function update(array $fields, $table, $where=null, $sql=null)
     {
-        $set = null;
-        foreach (array_keys($fields) as $key) {
-            $set .= "`{$key}` = :{$key}, ";
+        if(is_null($sql)) {
+            $sql = 'UPDATE %1$s SET %2$s %3$s;';
         }
 
+        $set = [];
+        foreach (array_keys($fields) as $key) {
+            $set[] = "`{$key}` = :{$key}";
+        }
+
+        $set = implode(", ", $set);
+
+        $where = !is_null($where)
+            ? " WHERE {$where}"
+            : ""
+        ;
+
         $query = $this->prepare(sprintf(
-            'UPDATE %s SET %s %s', $table, rtrim($set, ', '), ($where != null ? " WHERE {$where}" : null)
+            $sql,
+            $table,
+            $set,
+            $where
         ));
 
         // $value MUST be passed to bindParam by reference or it will fail!
