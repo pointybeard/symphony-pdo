@@ -1,33 +1,22 @@
-Symphony PDO
-===========
+# SymphonyCMS PDO Connector
 
-[![Latest Stable Version](https://poser.pugx.org/pointybeard/symphony-pdo/v/stable)](https://packagist.org/packages/pointybeard/symphony-pdo) [![Total Downloads](https://poser.pugx.org/pointybeard/symphony-pdo/downloads)](https://packagist.org/packages/pointybeard/symphony-pdo) [![Latest Unstable Version](https://poser.pugx.org/pointybeard/symphony-pdo/v/unstable)](https://packagist.org/packages/pointybeard/symphony-pdo) [![License](https://poser.pugx.org/pointybeard/symphony-pdo/license)](https://packagist.org/packages/pointybeard/symphony-pdo)
+- Version: v0.1.5
+- Date: Nov 19 2018
+- [Release notes](https://github.com/pointybeard/symphony-pdo/blob/master/CHANGELOG.md)
+- [GitHub repository](https://github.com/pointybeard/symphony-pdo)
+
+[![Latest Stable Version](https://poser.pugx.org/pointybeard/symphony-pdo/version)](https://packagist.org/packages/pointybeard/symphony-pdo) [![License](https://poser.pugx.org/pointybeard/symphony-pdo/license)](https://packagist.org/packages/pointybeard/symphony-pdo)
 
 Provides PDO based connection to the Symphony database.
 
-## Features
-
- * Provides a PDO based wrapper around the Symphony core database connection
- * Cleaner, more efficent, driver for interacting with the Symphony database
-
 ## Installation
 
-Symphony PDO is installed via [Composer](http://getcomposer.org/). To install, simply add it
-to your `composer.json` file:
-
-```json
-{
-    "require": {
-        "pointybeard/symphony-pdo": "~0.1"
-    }
-}
-```
+This library is installed via [Composer](http://getcomposer.org/). To install, use `composer require pointybeard/symphony-pdo` or add `"pointybeard/symphony-pdo": "~1.0"` to your `composer.json` file.
 
 And run composer to update your dependencies:
 
     $ curl -s http://getcomposer.org/installer | php
     $ php composer.phar update
-
 
 ## Usage
 
@@ -45,7 +34,6 @@ $query->bindParam(':value', $b, PDO::PARAM_STR);
 $query->execute();
 $result = $query->fetch();
 
-
 // Or use the ResultIterator class instead
 new SymphonyPDO\Lib\ResultIterator(
 	"\\A\\Properties\\Class",
@@ -54,8 +42,15 @@ new SymphonyPDO\Lib\ResultIterator(
 
 ```
 
-
 ## Support
 
 If you believe you have found a bug, please report it using the [GitHub issue tracker](https://github.com/pointybeard/symphony-pdo/issues),
 or better yet, fork the library and submit a pull request.
+
+## Contributing
+
+We encourage you to contribute to this project. Please check out the [Contributing documentation](https://github.com/pointybeard/symphony-pdo/blob/master/CONTRIBUTING.md) for guidelines about how to get involved.
+
+## License
+
+"SymphonyCMS PDO Connector" is released under the [MIT License](http://www.opensource.org/licenses/MIT).
