@@ -38,7 +38,7 @@ class ResultIterator implements \Iterator, \Countable
      * @param string        $className
      * @param \PDOStatement $statement
      */
-    public function __construct($className, \PDOStatement $statement)
+    public function __construct($className, \PDOStatement $statement, $flags=\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE)
     {
         $this->statement = $statement;
         $this->className = $className;
@@ -57,7 +57,7 @@ class ResultIterator implements \Iterator, \Countable
         // $className. The values of fields in the row are automatically injected into
         // the properties of the class. \PDO::FETCH_PROPS_LATE tells it to call the constructor
         // first.
-        $this->statement->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $className);
+        $this->statement->setFetchMode($flags, $className);
     }
 
     /**
@@ -148,7 +148,7 @@ class ResultIterator implements \Iterator, \Countable
         $this->rewind();
 
         // Loop over every item in the iterator
-        while($this->valid()){
+        while ($this->valid()) {
             // Execute the callback, giving it the data and any argments passed in
             $callback($this->current(), $args);
             // Move the cursor
