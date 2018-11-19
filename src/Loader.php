@@ -2,7 +2,8 @@
 
 namespace SymphonyPDO;
 
-use PDO, Symphony;
+use PDO;
+use Symphony;
 use SymphonyPDO\Lib;
 
 final class Loader implements \Singleton

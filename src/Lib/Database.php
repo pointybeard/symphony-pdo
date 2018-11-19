@@ -90,7 +90,8 @@ class Database
         return $type;
     }
 
-    public function insertUpdate(array $fields, array $updatableFields, $table) {
+    public function insertUpdate(array $fields, array $updatableFields, $table)
+    {
         $set = [];
         foreach ($updatableFields as $key) {
             $set[] = "`{$key}` = :{$key}";
@@ -103,7 +104,7 @@ class Database
 
     public function insert(array $fields, $table, $sql=null)
     {
-        if(is_null($sql)) {
+        if (is_null($sql)) {
             $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s);';
         }
 
@@ -111,7 +112,7 @@ class Database
         $keys = $values = [];
 
         foreach (array_keys($fields) as $key) {
-            if(!is_null($fields[$key])) {
+            if (!is_null($fields[$key])) {
                 $params[] = $key;
             }
             $keys[] = "`{$key}`";
@@ -128,7 +129,7 @@ class Database
         // $value MUST be passed to bindParam by reference or it will fail!
         // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
         foreach ($fields as $key => &$value) {
-            if(!in_array($key, $params)) {
+            if (!in_array($key, $params)) {
                 continue;
             }
 
@@ -142,7 +143,7 @@ class Database
 
     public function update(array $fields, $table, $where=null, $sql=null)
     {
-        if(is_null($sql)) {
+        if (is_null($sql)) {
             $sql = 'UPDATE %1$s SET %2$s %3$s;';
         }
 

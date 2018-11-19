@@ -24,7 +24,8 @@ class SymphonyPDO extends \PDO
             return parent::beginTransaction();
         }
         $this->exec(sprintf(
-            "SAVEPOINT `%s`", $this->savePointName()
+            "SAVEPOINT `%s`",
+            $this->savePointName()
         ));
         return $this->openTransactions >= 0;
     }
@@ -43,7 +44,8 @@ class SymphonyPDO extends \PDO
         $this->openTransactions--;
         if ((bool)$this->openTransactions == true) {
             $this->exec(sprintf(
-                'ROLLBACK TO `%s`', $this->savePointName($this->openTransactions + 1)
+                'ROLLBACK TO `%s`',
+                $this->savePointName($this->openTransactions + 1)
             ));
             return true;
         }
