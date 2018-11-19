@@ -35,8 +35,7 @@ final class Loader implements \Singleton
                 'table-prefix' => (string) $details->tbl_prefix,
             ],
             [
-                PDO::ATTR_ERRMODE,
-                PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]
         );
 
