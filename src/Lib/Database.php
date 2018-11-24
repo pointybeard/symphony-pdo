@@ -47,7 +47,7 @@ class Database
 
     public function connected()
     {
-        return $this->connection instanceof PDO;
+        return ($this->connection instanceof PDO);
     }
 
     public static function bindMultiple($query, $params, &$variable, $type)
@@ -139,7 +139,7 @@ class Database
         );
 
         return $this->doInTransaction(function(Database $db) use ($sql, $fields, $params) {
-            $query = $this->prepare($sql);
+            $query = $db->prepare($sql);
 
             // $value MUST be passed to bindParam by reference or it will fail!
             // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
@@ -180,7 +180,7 @@ class Database
         );
 
         return $this->doInTransaction(function(Database $db) use ($sql, $fields) {
-            $query = $this->prepare($sql);
+            $query = $db->prepare($sql);
 
             // $value MUST be passed to bindParam by reference or it will fail!
             // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
@@ -201,7 +201,7 @@ class Database
         );
 
         return $this->doInTransaction(function(Database $db) use ($sql) {
-            $query = $this->prepare($sql);
+            $query = $db->prepare($sql);
             return $query->execute();
         });
     }
@@ -211,7 +211,7 @@ class Database
         $sql = sprintf('TRUNCATE `%s`', $this->replaceTablePrefix($table));
 
         return $this->doInTransaction(function(Database $db) use ($sql) {
-            $query = $this->prepare($sql);
+            $query = $db->prepare($sql);
             return $query->execute();
         });
     }
