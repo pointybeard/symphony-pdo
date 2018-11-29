@@ -10,6 +10,18 @@ class Database
     private $connection;
     private $tablePrefix;
 
+    public function doInTransaction(\Closure $query) {
+        $this->beginTransaction();
+        try {
+            $result = $query($this);
+            $this->commit();
+        } catch (\PDOException $ex) {
+            $this->rollBack();
+            throw $ex;
+        }
+        return $result;
+    }
+
     public function __construct($dsn, $user, $password, array $options = null, array $attributes = null)
     {
         $this->tablePrefix = null;
@@ -35,10 +47,10 @@ class Database
 
     public function connected()
     {
-        return $this->connection instanceof PDO;
+        return ($this->connection instanceof PDO);
     }
 
-    public function bindMultiple($query, $params, &$variable, $type)
+    public static function bindMultiple($query, $params, &$variable, $type)
     {
         foreach ($params as $param) {
             $query->bindParam($param, $variable, $type);
@@ -54,7 +66,7 @@ class Database
         return $statement;
     }
 
-    private function __findType($value)
+    private static function findParamType($value)
     {
         $type = false;
 
@@ -119,26 +131,30 @@ class Database
             $values[] = (is_null($fields[$key]) ? 'NULL' : ":{$key}");
         }
 
-        $query = $this->prepare(sprintf(
-            $sql,
-            $table,
-            implode(", ", $keys),
-            implode(", ", $values)
-        ));
+        $keys = implode(", ", $keys);
+        $values = implode(", ", $values);
 
-        // $value MUST be passed to bindParam by reference or it will fail!
-        // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
-        foreach ($fields as $key => &$value) {
-            if (!in_array($key, $params)) {
-                continue;
+        $sql = sprintf(
+            $sql, $table, $keys, $values
+        );
+
+        return $this->doInTransaction(function(Database $db) use ($sql, $fields, $params) {
+            $query = $db->prepare($sql);
+
+            // $value MUST be passed to bindParam by reference or it will fail!
+            // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
+            foreach ($fields as $key => &$value) {
+                if (!in_array($key, $params)) {
+                    continue;
+                }
+
+                $query->bindParam(sprintf(':%s', $key), $value, self::findParamType($value));
             }
 
-            $query->bindParam(sprintf(':%s', $key), $value, $this->__findType($value));
-        }
+            $query->execute();
 
-        $query->execute();
-
-        return $this->lastInsertId();
+            return $db->lastInsertId();
+        });
     }
 
     public function update(array $fields, $table, $where=null, $sql=null)
@@ -159,34 +175,45 @@ class Database
             : ""
         ;
 
-        $query = $this->prepare(sprintf(
-            $sql,
-            $table,
-            $set,
-            $where
-        ));
+        $sql = sprintf(
+            $sql, $table, $set, $where
+        );
 
-        // $value MUST be passed to bindParam by reference or it will fail!
-        // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
-        foreach ($fields as $key => &$value) {
-            $query->bindParam(sprintf(':%s', $key), $value, $this->__findType($value));
-        }
+        return $this->doInTransaction(function(Database $db) use ($sql, $fields) {
+            $query = $db->prepare($sql);
 
-        return $query->execute();
+            // $value MUST be passed to bindParam by reference or it will fail!
+            // http://stackoverflow.com/questions/12144557/php-pdo-bindparam-was-falling-in-a-foreach
+            foreach ($fields as $key => &$value) {
+                $query->bindParam(sprintf(':%s', $key), $value, self::findParamType($value));
+            }
+
+            return $query->execute();
+        });
     }
 
     public function delete($table, $where)
     {
-        $query = $this->prepare(sprintf('DELETE FROM `%s` WHERE %s', $this->replaceTablePrefix($table), $where));
+        $sql = sprintf(
+            'DELETE FROM `%s` WHERE %s',
+            $this->replaceTablePrefix($table),
+            $where
+        );
 
-        return $query->execute();
+        return $this->doInTransaction(function(Database $db) use ($sql) {
+            $query = $db->prepare($sql);
+            return $query->execute();
+        });
     }
 
     public function truncate($table)
     {
-        $query = $this->prepare(sprintf('TRUNCATE `%s`', $this->replaceTablePrefix($table)));
+        $sql = sprintf('TRUNCATE `%s`', $this->replaceTablePrefix($table));
 
-        return $query->execute();
+        return $this->doInTransaction(function(Database $db) use ($sql) {
+            $query = $db->prepare($sql);
+            return $query->execute();
+        });
     }
 
     public function __call($name, $args)
@@ -197,7 +224,6 @@ class Database
         $callback = array($this->connection, $name);
 
         switch ($name) {
-
             // Replace `tbl_` with the assigned table prefix
             case 'prepare':
             case 'query':

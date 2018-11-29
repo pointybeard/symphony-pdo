@@ -10,30 +10,39 @@ final class Loader implements \Singleton
 {
     private static $connection;
 
-    public static function instance()
+    public static function instance(\StdClass $credentials=null)
     {
         if (!(self::$connection instanceof Lib\Database)) {
-            self::$connection = self::init();
+            // Try to load in the credentials from Symphony if nothing was
+            // supplied. This is just for backwards compatiblity. Eventually
+            // credentials will always be required to be passed in.
+            if(is_null($credentials)) {
+                if(!(Symphony::Configuration() instanceof \Configuration)) {
+                    throw new Lib\Exceptions\DatabaseException("No credentials supplied to SymphonyPDO Loader and Symphony doesn't appear to have been initialised so there is no Configuration class.");
+                }
+                $credentials = (object) Symphony::Configuration()->get('database');
+            }
+
+            self::$connection = self::init($credentials);
         }
 
         return self::$connection;
     }
 
-    private static function init()
+    private static function init(\StdClass $credentials=null)
     {
-        $details = (object) Symphony::Configuration()->get('database');
         self::$connection = new Lib\Database(
             sprintf(
                 '%s:host=%s;port=%s;dbname=%s;charset=utf8',
                     'mysql',
-                    $details->host,
-                    $details->port,
-                    $details->db
+                    $credentials->host,
+                    $credentials->port,
+                    $credentials->db
             ),
-            $details->user,
-            $details->password,
+            $credentials->user,
+            $credentials->password,
             [
-                'table-prefix' => (string) $details->tbl_prefix,
+                'table-prefix' => (string) $credentials->tbl_prefix,
             ],
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
