@@ -4,6 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 Handling empty arguments array gracefully. Updated unit tests, adding new test for empty arguments.
 
+## [0.1.6] - 2018-11-30
+#### Added
+- Added `doInTransaction()` method to SymphonyPDO to Database class
+
+#### Changed
+- Database `update`, `delete`, `truncate`, `insert`, and `insertUpdate` are all using `doInTransaction()` now
+- Made `findParamType` and `bindMultiple` static
+- Renamed `__findType()` to `findParamType()`
+- Updated Loader to allow passing database credentials in to the `instance()` method
+
 ## [0.1.5] - 2018-11-19
 #### Changed
 - Code clean up with PHP CS Fixer
@@ -38,6 +48,7 @@ Handling empty arguments array gracefully. Updated unit tests, adding new test f
 #### Added
 - Initial release
 
+[0.1.6]: https://github.com/pointybeard/symphony-pdo/compare/0.1.5...0.1.6
 [0.1.5]: https://github.com/pointybeard/symphony-pdo/compare/0.1.4...0.1.5
 [0.1.4]: https://github.com/pointybeard/symphony-pdo/compare/0.1.3...0.1.4
 [0.1.3]: https://github.com/pointybeard/symphony-pdo/compare/0.1.2...0.1.3

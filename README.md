@@ -1,7 +1,7 @@
 # SymphonyCMS PDO Connector
 
-- Version: v0.1.5
-- Date: Nov 19 2018
+- Version: v0.1.6
+- Date: Nov 30 2018
 - [Release notes](https://github.com/pointybeard/symphony-pdo/blob/master/CHANGELOG.md)
 - [GitHub repository](https://github.com/pointybeard/symphony-pdo)
 
