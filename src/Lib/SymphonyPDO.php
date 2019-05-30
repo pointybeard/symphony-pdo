@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SymphonyPDO\Lib;
 
 class SymphonyPDO extends \PDO
