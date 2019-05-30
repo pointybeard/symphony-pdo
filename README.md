@@ -1,17 +1,15 @@
-# SymphonyCMS PDO Connector
+# SymphonyCMS: PDO Database Wrapper
 
-- Version: v0.1.6
-- Date: Nov 30 2018
+- Version: v0.1.7
+- Date: May 30 2019
 - [Release notes](https://github.com/pointybeard/symphony-pdo/blob/master/CHANGELOG.md)
 - [GitHub repository](https://github.com/pointybeard/symphony-pdo)
 
-[![Latest Stable Version](https://poser.pugx.org/pointybeard/symphony-pdo/version)](https://packagist.org/packages/pointybeard/symphony-pdo) [![License](https://poser.pugx.org/pointybeard/symphony-pdo/license)](https://packagist.org/packages/pointybeard/symphony-pdo)
-
-Provides PDO based connection to the Symphony database.
+Wraps the core [Symphony CMS](http://www.getsymphony.com/) database connection with a PDO based library
 
 ## Installation
 
-This library is installed via [Composer](http://getcomposer.org/). To install, use `composer require pointybeard/symphony-pdo` or add `"pointybeard/symphony-pdo": "~1.0"` to your `composer.json` file.
+This library is installed via [Composer](http://getcomposer.org/). To install, use `composer require pointybeard/symphony-pdo` or add `"pointybeard/symphony-pdo": "~0.1"` to your `composer.json` file.
 
 And run composer to update your dependencies:
 
@@ -22,23 +20,21 @@ And run composer to update your dependencies:
 
 ```php
 <?php
-use pointybeard\SymphonyPDO;
+use SymphonyPDO;
 
-$db = SymphonyPDO\Loader::instance();
-
-$query = $db->prepare(sprintf(
-    'SELECT e.entry_id FROM `tbl_entries_data_%d` AS `e` WHERE e.value = :value LIMIT 1',
-    'some value'
-));
-$query->bindParam(':value', $b, PDO::PARAM_STR);
-$query->execute();
-$result = $query->fetch();
-
-// Or use the ResultIterator class instead
-new SymphonyPDO\Lib\ResultIterator(
-	"\\A\\Properties\\Class",
-	$query
+$query = SymphonyPDO\Loader::instance()->query(
+    'SELECT * FROM `tbl_sections` ORDER BY `id` ASC;'
 );
+
+var_dump($query->fetchObject()->name);
+// string(8) "Articles"
+
+// Or, better yet, use a ResultIterator instead
+foreach(new SymphonyPDO\Lib\ResultIterator('\stdClass', $query) as $result) {
+    printf('%d => %s (%s)' . PHP_EOL, $result->id, $result->name, $result->handle);
+}
+// 1 => Articles (articles)
+// 2 => Categorties (categories)
 
 ```
 
@@ -53,4 +49,4 @@ We encourage you to contribute to this project. Please check out the [Contributi
 
 ## License
 
-"SymphonyCMS PDO Connector" is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+"SymphonyCMS: PDO Database Wrapper" is released under the [MIT License](http://www.opensource.org/licenses/MIT).

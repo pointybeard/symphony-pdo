@@ -1,3 +1,4 @@
 .DS_Store
-vendor/*
-tests/reports/*
+vendor
+tests/reports
+.php_cs.cache
