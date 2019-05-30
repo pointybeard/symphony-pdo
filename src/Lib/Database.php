@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SymphonyPDO\Lib;
 
 use SymphonyPDO\Lib\Exceptions\DatabaseException;
@@ -10,7 +12,8 @@ class Database
     private $connection;
     private $tablePrefix;
 
-    public function doInTransaction(\Closure $query) {
+    public function doInTransaction(\Closure $query)
+    {
         $this->beginTransaction();
         try {
             $result = $query($this);
@@ -19,6 +22,7 @@ class Database
             $this->rollBack();
             throw $ex;
         }
+
         return $result;
     }
 
@@ -47,7 +51,7 @@ class Database
 
     public function connected()
     {
-        return ($this->connection instanceof PDO);
+        return $this->connection instanceof PDO;
     }
 
     public static function bindMultiple($query, $params, &$variable, $type)
@@ -59,7 +63,7 @@ class Database
 
     public function replaceTablePrefix($statement)
     {
-        if (!is_null($this->tablePrefix)) {
+        if (null !== $this->tablePrefix) {
             $statement = preg_replace('/tbl_(\S+?)([\s\.,]|$)/', $this->tablePrefix.'\\1\\2', $statement);
         }
 
@@ -71,7 +75,6 @@ class Database
         $type = false;
 
         switch (gettype($value)) {
-
             case 'boolean':
                 $type = PDO::PARAM_BOOL;
                 break;
@@ -96,7 +99,6 @@ class Database
             default:
                 $type = PDO::PARAM_STR;
                 break;
-
         }
 
         return $type;
@@ -109,14 +111,14 @@ class Database
             $set[] = "`{$key}` = :{$key}";
         }
 
-        $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s) ON DUPLICATE KEY UPDATE ' . implode(", ", $set);
+        $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s) ON DUPLICATE KEY UPDATE '.implode(', ', $set);
 
         return $this->insert($fields, $table, $sql);
     }
 
-    public function insert(array $fields, $table, $sql=null)
+    public function insert(array $fields, $table, $sql = null)
     {
-        if (is_null($sql)) {
+        if (null === $sql) {
             $sql = 'INSERT INTO %1$s (%2$s) VALUES (%3$s);';
         }
 
@@ -124,21 +126,24 @@ class Database
         $keys = $values = [];
 
         foreach (array_keys($fields) as $key) {
-            if (!is_null($fields[$key])) {
+            if (null !== $fields[$key]) {
                 $params[] = $key;
             }
             $keys[] = "`{$key}`";
-            $values[] = (is_null($fields[$key]) ? 'NULL' : ":{$key}");
+            $values[] = (null === $fields[$key] ? 'NULL' : ":{$key}");
         }
 
-        $keys = implode(", ", $keys);
-        $values = implode(", ", $values);
+        $keys = implode(', ', $keys);
+        $values = implode(', ', $values);
 
         $sql = sprintf(
-            $sql, $table, $keys, $values
+            $sql,
+            $table,
+            $keys,
+            $values
         );
 
-        return $this->doInTransaction(function(Database $db) use ($sql, $fields, $params) {
+        return $this->doInTransaction(function (Database $db) use ($sql, $fields, $params) {
             $query = $db->prepare($sql);
 
             // $value MUST be passed to bindParam by reference or it will fail!
@@ -157,9 +162,9 @@ class Database
         });
     }
 
-    public function update(array $fields, $table, $where=null, $sql=null)
+    public function update(array $fields, $table, $where = null, $sql = null)
     {
-        if (is_null($sql)) {
+        if (null === $sql) {
             $sql = 'UPDATE %1$s SET %2$s %3$s;';
         }
 
@@ -168,18 +173,21 @@ class Database
             $set[] = "`{$key}` = :{$key}";
         }
 
-        $set = implode(", ", $set);
+        $set = implode(', ', $set);
 
-        $where = !is_null($where)
+        $where = null !== $where
             ? " WHERE {$where}"
-            : ""
+            : ''
         ;
 
         $sql = sprintf(
-            $sql, $table, $set, $where
+            $sql,
+            $table,
+            $set,
+            $where
         );
 
-        return $this->doInTransaction(function(Database $db) use ($sql, $fields) {
+        return $this->doInTransaction(function (Database $db) use ($sql, $fields) {
             $query = $db->prepare($sql);
 
             // $value MUST be passed to bindParam by reference or it will fail!
@@ -200,8 +208,9 @@ class Database
             $where
         );
 
-        return $this->doInTransaction(function(Database $db) use ($sql) {
+        return $this->doInTransaction(function (Database $db) use ($sql) {
             $query = $db->prepare($sql);
+
             return $query->execute();
         });
     }
@@ -210,8 +219,9 @@ class Database
     {
         $sql = sprintf('TRUNCATE `%s`', $this->replaceTablePrefix($table));
 
-        return $this->doInTransaction(function(Database $db) use ($sql) {
+        return $this->doInTransaction(function (Database $db) use ($sql) {
             $query = $db->prepare($sql);
+
             return $query->execute();
         });
     }

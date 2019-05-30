@@ -1,54 +1,95 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SymphonyPDO;
 
 use PDO;
 use Symphony;
-use SymphonyPDO\Lib;
 
-final class Loader implements \Singleton
+final class Loader
 {
-    private static $connection;
+    private static $connection = null;
+    private static $credentials = null;
 
-    public static function instance(\StdClass $credentials=null)
+    // Prevents the class from being instanciated
+    private function __construct()
     {
-        if (!(self::$connection instanceof Lib\Database)) {
-            // Try to load in the credentials from Symphony if nothing was
-            // supplied. This is just for backwards compatiblity. Eventually
-            // credentials will always be required to be passed in.
-            if(is_null($credentials)) {
-                if(!(Symphony::Configuration() instanceof \Configuration)) {
-                    throw new Lib\Exceptions\DatabaseException("No credentials supplied to SymphonyPDO Loader and Symphony doesn't appear to have been initialised so there is no Configuration class.");
-                }
-                $credentials = (object) Symphony::Configuration()->get('database');
-            }
+    }
 
-            self::$connection = self::init($credentials);
+    public function isConnected()
+    {
+        return self::getConnection() instanceof Lib\Database;
+    }
+
+    public function closeConnection()
+    {
+        self::$connection = null;
+        self::$credentials = null;
+    }
+
+    public static function instance(\StdClass $credentials = null)
+    {
+        if (null !== $credentials && $credentials !== self::$credentials) {
+            self::closeConnection();
+            self::setCredentials($credentials);
         }
 
+        if (!self::isConnected()) {
+            self::init();
+        }
+
+        return self::getConnection();
+    }
+
+    public static function bind(Lib\Database $connection, \StdClass $credentials = null)
+    {
+        self::$connection = $connection;
+        if (null !== $credentials) {
+            self::setCredentials($credentials);
+        }
+    }
+
+    public static function getConnection()
+    {
         return self::$connection;
     }
 
-    private static function init(\StdClass $credentials=null)
+    public static function getCredentials()
     {
-        self::$connection = new Lib\Database(
+        if (null === self::$credentials) {
+            if (!(Symphony::Configuration() instanceof \Configuration)) {
+                throw new Lib\Exceptions\DatabaseException("No credentials were supplied to SymphonyPDO::Loader and Symphony doesn't appear to have been initialised. There is no Configuration class to obtain credentials from.");
+            }
+            self::setCredentials((object) Symphony::Configuration()->get('database'));
+        }
+
+        return self::$credentials;
+    }
+
+    private static function setCredentials(\StdClass $credentials)
+    {
+        self::$credentials = $credentials;
+    }
+
+    private static function init()
+    {
+        self::bind(new Lib\Database(
             sprintf(
                 '%s:host=%s;port=%s;dbname=%s;charset=utf8',
-                    'mysql',
-                    $credentials->host,
-                    $credentials->port,
-                    $credentials->db
+                'mysql',
+                self::getCredentials()->host,
+                self::getCredentials()->port,
+                self::getCredentials()->db
             ),
-            $credentials->user,
-            $credentials->password,
+            self::getCredentials()->user,
+            self::getCredentials()->password,
             [
-                'table-prefix' => (string) $credentials->tbl_prefix,
+                'table-prefix' => (string) self::getCredentials()->tbl_prefix,
             ],
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]
-        );
-
-        return self::$connection;
+        ));
     }
 }

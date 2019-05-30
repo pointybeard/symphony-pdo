@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SymphonyPDO\Lib;
 
 /**
@@ -21,14 +23,14 @@ class ResultIterator implements \Iterator, \Countable
     protected $position;
 
     /**
-     * @var object Holds an instance of $this->className containing the current row of data
+     * @var object Holds an instance of->className containing the current row of data
      */
     protected $current;
 
     /**
      * @var int
-     *   Used by the current() method. Allows current() to be called multiple times
-     *   without advancing the cursor
+     *          Used by the current() method. Allows current() to be called multiple times
+     *          without advancing the cursor
      */
     protected $lastPosition;
 
@@ -38,7 +40,7 @@ class ResultIterator implements \Iterator, \Countable
      * @param string        $className
      * @param \PDOStatement $statement
      */
-    public function __construct($className, \PDOStatement $statement, $flags=\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE)
+    public function __construct($className, \PDOStatement $statement, $flags = \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE)
     {
         $this->statement = $statement;
         $this->className = $className;
@@ -154,7 +156,7 @@ class ResultIterator implements \Iterator, \Countable
             // Move the cursor
             $this->next();
             // Keep track of the number of items we've looped over
-            $count++;
+            ++$count;
         }
 
         // Go back to the start
