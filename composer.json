@@ -1,6 +1,6 @@
 {
     "name": "pointybeard/symphony-pdo",
-    "version": "0.1.7",
+    "version": "0.1.7.1",
     "description": "Wraps the core Symphony CMS database connection with a PDO based library",
     "homepage": "https://github.com/pointybeard/symphony-pdo",
     "keywords": ["symphony", "database", "pdo", "wrapper"],
