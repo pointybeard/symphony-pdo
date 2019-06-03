@@ -15,7 +15,7 @@ final class Loader
     {
     }
 
-    public function isConnected()
+    public static function isConnected()
     {
         return self::getConnection() instanceof Lib\Database;
     }
