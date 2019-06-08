@@ -20,7 +20,7 @@ final class Loader
         return self::getConnection() instanceof Lib\Database;
     }
 
-    public function closeConnection()
+    public static function closeConnection()
     {
         self::$connection = null;
         self::$credentials = null;
