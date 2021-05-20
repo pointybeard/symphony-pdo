@@ -74,17 +74,16 @@ final class Loader
     {
         self::bind(new Lib\Database(
             sprintf(
-                '%s:host=%s;port=%s;dbname=%s;charset=utf8',
+                '%s:host=%s;port=%s;dbname=%s;charset=%s',
                 'mysql',
                 self::getCredentials()->host,
                 self::getCredentials()->port,
-                self::getCredentials()->db
+                self::getCredentials()->db,
+                self::getCredentials()->character_set ?: "utf8mb4"
             ),
             self::getCredentials()->user,
             self::getCredentials()->password,
-            [
-                'table-prefix' => (string) self::getCredentials()->tbl_prefix,
-            ],
+            [],
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]
